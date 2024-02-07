@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package paxoskv;
+
+option go_package = "moemoefish/algoritm-go/paxoskv";
+
+service PaxosKV {
+    rpc Prepare (Proposer) returns (Acceptor) {}
+    rpc Accept (Proposer) returns (Acceptor) {}
+}
+
+message Value {
+    int64 Vi64 = 1;
+}
+
+message BalloutNum {
+    int64 N = 1;
+    int64 ProposerId = 2;
+}
+
+message PaxosInstanceId {
+    string Key = 1;
+    int64 Ver = 2;
+}
+
+message Proposer {
+    PaxosInstanceId Id = 1;
+    BalloutNum Bal = 2;
+    Value Val= 3;
+}
+
+message Acceptor {
+    BalloutNum LastBal = 1;
+    BalloutNum VBal = 2;
+    Value Val = 3;
+}
