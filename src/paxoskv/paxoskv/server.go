@@ -21,6 +21,10 @@ func (l *BalloutNum) GE(r *BalloutNum) bool {
 	return l.ProposerId > r.ProposerId
 }
 
+func (l *BalloutNum) LT(r *BalloutNum) bool {
+	return !l.GE(r)
+}
+
 type Version struct {
 	mu       sync.Mutex
 	acceptor Acceptor
