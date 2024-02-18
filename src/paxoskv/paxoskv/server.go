@@ -11,6 +11,16 @@ var (
 	AcceptorBasePort = int64(3333)
 )
 
+func (l *BalloutNum) GE(r *BalloutNum) bool {
+	if l.N > r.N {
+		return true
+	} else if l.N < r.N {
+		return false
+	}
+
+	return l.ProposerId > r.ProposerId
+}
+
 type Version struct {
 	mu       sync.Mutex
 	acceptor Acceptor
@@ -55,4 +65,30 @@ func (s *KVServer) getLockedVersion(id *PaxosInstanceId) *Version {
 
 func (s *KVServer) Prepare(ctx context.Context, r *Proposer) (*Acceptor, error) {
 	v := s.getLockedVersion(r.Id)
+	defer v.mu.Unlock()
+
+	reply := v.acceptor
+
+	if r.Bal.GE(reply.LastBal) {
+		reply.LastBal = r.Bal
+	}
+
+	return &reply, nil
+}
+
+func (s *KVServer) Accept(ctx context.Context, r *Proposer) (*Acceptor, error) {
+	v := s.getLockedVersion(r.Id)
+	defer v.mu.Unlock()
+
+	reply := Acceptor{
+		LastBal: &*v.acceptor.LastBal,
+	}
+
+	if r.Bal.GE(reply.LastBal) {
+		v.acceptor.LastBal = r.Bal
+		v.acceptor.VBal = r.Bal
+		v.acceptor.Val = r.Val
+	}
+
+	return &reply, nil
 }
