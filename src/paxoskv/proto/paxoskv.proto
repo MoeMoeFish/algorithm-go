@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package paxoskv;
 
-option go_package = "moemoefish/algoritm-go/paxoskv";
+option go_package = "paxoskv";
 
 service PaxosKV {
     rpc Prepare (Proposer) returns (Acceptor) {}
